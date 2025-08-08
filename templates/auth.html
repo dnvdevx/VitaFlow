@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitaFlow — Login / Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-container {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(31, 38, 135, 0.08);
+            padding: 40px 30px 30px 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .brand-logo {
+            display: block;
+            text-align: center;
+            font-weight: 900;
+            font-size: 2.1rem;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #4f8cff, #6a82fb, #27ae60, #4f8cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 8px 24px rgba(79,140,255,0.25);
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .brand-logo::after {
+            content: "";
+            position: absolute;
+            left: 20%;
+            right: 20%;
+            bottom: -6px;
+            height: 4px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #4f8cff, #6a82fb, #27ae60, #4f8cff);
+            background-size: 200% 100%;
+            animation: brandFlow 2.6s linear infinite;
+        }
+        @keyframes brandFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4f8cff;
+        }
+        .tab-switch {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .tab-switch button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #7f8c8d;
+            margin: 0 10px;
+            cursor: pointer;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .tab-switch button.active {
+            background: linear-gradient(45deg, #4f8cff, #6a82fb);
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 13px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4f8cff;
+            background: #f4f8ff;
+        }
+        .btn {
+            background: linear-gradient(45deg, #4f8cff, #6a82fb);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: linear-gradient(45deg, #6a82fb, #4f8cff);
+        }
+        .role-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .role-group label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0;
+        }
+        .hidden { display: none; }
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="brand-logo">VitaFlow</div>
+        <div class="tab-switch">
+            <button id="loginTab" class="active" onclick="showTab('login')">Login</button>
+            <button id="signupTab" onclick="showTab('signup')">Sign Up</button>
+        </div>
+        <div id="loginForm">
+            <h2>Login</h2>
+            <div class="error-message" id="loginError"></div>
+            <form>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group password-group">
+                    <label for="loginPassword">Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="loginPassword" required style="padding-right:32px;">
+                        <span class="toggle-password" onclick="togglePassword('loginPassword', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer;">
+                            <i class="fa fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+        <div id="signupForm" class="hidden">
+            <h2>Sign Up</h2>
+            <div class="error-message" id="signupError"></div>
+            <form>
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group password-group">
+                    <label for="signupPassword">Password</label>
+                    <div style="position:relative;">
+                        <input type="password" id="signupPassword" required style="padding-right:32px;" oninput="validatePassword()">
+                        <span class="toggle-password" onclick="togglePassword('signupPassword', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer;">
+                            <i class="fa fa-eye"></i>
+                        </span>
+                    </div>
+                    <div id="passwordStrength" style="margin-top:5px; font-size:0.95em;"></div>
+                    <ul id="passwordCriteria" style="list-style:none; padding-left:0; font-size:0.95em; color:#888; margin:5px 0 0 0;">
+                        <li id="lengthCriteria">&#10060; At least 8 characters</li>
+                        <li id="uppercaseCriteria">&#10060; At least one uppercase letter</li>
+                        <li id="numberCriteria">&#10060; At least one number</li>
+                        <li id="specialCriteria">&#10060; At least one special character</li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label for="signupRole">Role</label>
+                    <select id="signupRole" required onchange="toggleDepartment()">
+                        <option value="">Select Role</option>
+                        <option value="doctor">Doctor</option>
+                        <option value="admin">Admin</option>
+                        <option value="pharmacist">Pharmacist</option>
+                        <option value="nurse">Nurse</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="departmentGroup">
+                    <label for="signupDepartment">Department</label>
+                    <select id="signupDepartment">
+                        <option value="">Select Department</option>
+                        <option>Emergency Department (ER/ED)</option>
+                        <option>Internal Medicine</option>
+                        <option>Surgery</option>
+                        <option>Pediatrics</option>
+                        <option>Obstetrics & Gynecology (OB/GYN)</option>
+                        <option>Orthopedics</option>
+                        <option>Cardiology</option>
+                        <option>Neurology</option>
+                        <option>Oncology</option>
+                        <option>Radiology</option>
+                        <option>Anesthesiology</option>
+                        <option>Pathology</option>
+                        <option>Dermatology</option>
+                        <option>Psychiatry</option>
+                        <option>Ophthalmology</option>
+                        <option>ENT</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+        </div>
+
+       
+        <div id="otpModal" class="hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;z-index:1000;">
+            <div style="background:#fff;padding:32px 24px;border-radius:12px;max-width:350px;width:100%;box-shadow:0 2px 16px rgba(0,0,0,0.12);text-align:center;">
+                <h3 style="margin-bottom:18px;color:#4f8cff;">Verify Your Email</h3>
+                <div id="otpInfo" style="margin-bottom:10px;font-size:1em;color:#333;">Enter the 6-digit OTP sent to your email.</div>
+                <input id="otpInput" maxlength="6" style="font-size:1.2em;padding:10px 12px;width:80%;margin-bottom:10px;border:1.5px solid #ddd;border-radius:7px;text-align:center;letter-spacing:4px;" placeholder="------">
+                <div class="error-message" id="otpError" style="margin-bottom:10px;"></div>
+                <button id="verifyOtpBtn" class="btn" style="margin-bottom:8px;">Verify</button>
+                <div id="otpSuccess" style="color:#27ae60;font-weight:600;margin-top:8px;"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showTab(tab) {
+            document.getElementById('loginTab').classList.remove('active');
+            document.getElementById('signupTab').classList.remove('active');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            if(tab === 'login') {
+                document.getElementById('loginTab').classList.add('active');
+                document.getElementById('loginForm').classList.remove('hidden');
+            } else {
+                document.getElementById('signupTab').classList.add('active');
+                document.getElementById('signupForm').classList.remove('hidden');
+            }
+        }
+        function toggleDepartment() {
+            const role = document.getElementById('signupRole').value;
+            const deptGroup = document.getElementById('departmentGroup');
+            if(role === 'doctor') {
+                deptGroup.classList.remove('hidden');
+                document.getElementById('signupDepartment').setAttribute('required', 'required');
+            } else {
+                deptGroup.classList.add('hidden');
+                document.getElementById('signupDepartment').removeAttribute('required');
+            }
+        }
+
+        function togglePassword(inputId, iconSpan) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconSpan.innerHTML = '<i class="fa fa-eye"></i>';
+            } else {
+                input.type = 'password';
+                iconSpan.innerHTML = '<i class="fa fa-eye-slash"></i>';
+            }
+        }
+
+        function validatePassword() {
+            const pwd = document.getElementById('signupPassword').value;
+            let strength = 0;
+            
+            const length = pwd.length >= 8;
+            const upper = /[A-Z]/.test(pwd);
+            const number = /[0-9]/.test(pwd);
+            const special = /[^A-Za-z0-9]/.test(pwd);
+
+            
+            document.getElementById('lengthCriteria').innerHTML = (length ? '&#9989;' : '&#10060;') + ' At least 8 characters';
+            document.getElementById('uppercaseCriteria').innerHTML = (upper ? '&#9989;' : '&#10060;') + ' At least one uppercase letter';
+            document.getElementById('numberCriteria').innerHTML = (number ? '&#9989;' : '&#10060;') + ' At least one number';
+            document.getElementById('specialCriteria').innerHTML = (special ? '&#9989;' : '&#10060;') + ' At least one special character';
+
+            if(length) strength++;
+            if(upper) strength++;
+            if(number) strength++;
+            if(special) strength++;
+
+           
+            const meter = document.getElementById('passwordStrength');
+            if(pwd.length === 0) {
+                meter.textContent = '';
+            } else if(strength <= 1) {
+                meter.textContent = 'Strength: Weak';
+                meter.style.color = '#e74c3c';
+            } else if(strength === 2 || strength === 3) {
+                meter.textContent = 'Strength: Medium';
+                meter.style.color = '#f39c12';
+            } else if(strength === 4) {
+                meter.textContent = 'Strength: Strong';
+                meter.style.color = '#27ae60';
+            }
+        }
+
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const savedEmail = localStorage.getItem('rememberedEmail');
+            if(savedEmail) {
+                document.getElementById('loginEmail').value = savedEmail;
+                document.getElementById('rememberMe').checked = true;
+            }
+
+            
+            document.querySelector('#loginForm form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '';
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('username', email);
+                    formData.append('password', password);
+                    const resp = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok) {
+                        
+                        if (Array.isArray(data.detail)) {
+                            errorDiv.innerHTML = data.detail.map(e => e.msg || JSON.stringify(e)).join('<br>');
+                        } else {
+                            errorDiv.textContent = data.detail || 'Login failed.';
+                        }
+                        return;
+                    }
+                    
+                    localStorage.setItem('token', data.access_token);
+                    
+                    document.cookie = `token=${data.access_token}; path=/;`;
+                    
+                    if(document.getElementById('rememberMe').checked) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
+                    
+                    window.location.href = '/dashboard';
+                } catch (err) {
+                    errorDiv.textContent = 'Network error.';
+                }
+            });
+
+            
+            document.querySelector('#signupForm form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const role = document.getElementById('signupRole').value;
+                const department = role === 'doctor' ? document.getElementById('signupDepartment').value : '';
+                const errorDiv = document.getElementById('signupError');
+                errorDiv.textContent = '';
+
+                
+                const length = password.length >= 8;
+                const upper = /[A-Z]/.test(password);
+                const number = /[0-9]/.test(password);
+                const special = /[^A-Za-z0-9]/.test(password);
+                if (!(length && upper && number && special)) {
+                    errorDiv.textContent = 'Password does not meet requirements.';
+                    return;
+                }
+
+                try {
+                    const resp = await fetch('/api/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ name, email, password, role, department })
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok) {
+                        
+                        if (Array.isArray(data.detail)) {
+                            errorDiv.innerHTML = data.detail.map(e => e.msg || JSON.stringify(e)).join('<br>');
+                        } else {
+                            errorDiv.textContent = data.detail || 'Signup failed.';
+                        }
+                        
+                        const otpModal = document.getElementById('otpModal');
+                        otpModal.classList.remove('hidden');
+                        otpModal.style.display = 'flex';
+                        document.getElementById('otpInput').value = '';
+                        document.getElementById('otpError').textContent = 'Signup failed. Please try again.';
+                        document.getElementById('otpSuccess').textContent = '';
+                        document.getElementById('otpInfo').textContent = '';
+                        return;
+                    }
+                    
+                    const otpModal = document.getElementById('otpModal');
+                    otpModal.classList.remove('hidden');
+                    otpModal.style.display = 'flex';
+                    document.getElementById('otpInput').value = '';
+                    document.getElementById('otpError').textContent = '';
+                    document.getElementById('otpSuccess').textContent = '';
+                    document.getElementById('otpInfo').textContent = `Enter the 6-digit OTP sent to ${email}`;
+                    window._otpEmail = email;
+                } catch (err) {
+                    errorDiv.textContent = 'Error.';
+                }
+            });
+
+            
+            document.getElementById('verifyOtpBtn').addEventListener('click', async function() {
+                const otp = document.getElementById('otpInput').value.trim();
+                const email = window._otpEmail;
+                const errorDiv = document.getElementById('otpError');
+                const successDiv = document.getElementById('otpSuccess');
+                errorDiv.textContent = '';
+                successDiv.textContent = '';
+                if (!otp || otp.length !== 6) {
+                    errorDiv.textContent = 'Please enter the 6-digit OTP.';
+                    return;
+                }
+                try {
+                    const resp = await fetch('/api/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ email, otp })
+                    });
+                    const data = await resp.json();
+                    if (!resp.ok) {
+                        errorDiv.textContent = data.detail || 'OTP verification failed.';
+                        return;
+                    }
+                    
+                    successDiv.textContent = 'Account successfully created! Redirecting to login...';
+                    setTimeout(() => {
+                        const otpModal = document.getElementById('otpModal');
+                        otpModal.classList.add('hidden');
+                        otpModal.style.display = 'none';
+                        showTab('login');
+                    }, 2000);
+                } catch (err) {
+                    errorDiv.textContent = 'Network error.';
+                }
+            });
+        });
+            
+            document.getElementById('otpModal').classList.add('hidden');
+            document.getElementById('otpModal').style.display = 'none';
+    </script>
+</body>
+</html>

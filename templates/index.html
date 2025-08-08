@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitaFlow — Clinic Inventory Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        .item-group {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px 0 rgba(31,38,135,0.08);
+            margin-bottom: 22px;
+            padding: 22px 18px 12px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .item-group:hover {
+            box-shadow: 0 4px 18px 0 rgba(31,38,135,0.16);
+        }
+        .item-group strong {
+            font-size: 1.18em;
+            color: #2a4d7a;
+        }
+        .brand-list {
+            margin-top: 10px;
+        }
+        .brand-item {
+            margin-bottom: 6px;
+            padding-left: 10px;
+        }
+        .brand b {
+            color: #1a7fa1;
+        }
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            color: #222;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 20px 20px;
+        }
+        header {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 30px 30px 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            text-align: center;
+            position: relative;
+        }
+        .brand-logo {
+            display: inline-block;
+            font-weight: 900;
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #4f8cff, #6a82fb, #27ae60, #4f8cff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 8px 24px rgba(79,140,255,0.25);
+            position: relative;
+            margin-bottom: 6px;
+        }
+        .brand-logo::after {
+            content: "";
+            position: absolute;
+            left: 12%;
+            right: 12%;
+            bottom: -8px;
+            height: 4px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #4f8cff, #6a82fb, #27ae60, #4f8cff);
+            filter: saturate(1.1) drop-shadow(0 2px 6px rgba(79,140,255,0.35));
+            background-size: 200% 100%;
+            animation: brandFlow 2.6s linear infinite;
+        }
+        @keyframes brandFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 24px rgba(31, 38, 135, 0.08);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .stat-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
+        }
+        .stat-number {
+            font-size: 2.3rem;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .total-items .stat-number { color: #4f8cff; }
+        .low-stock .stat-number { color: #e74c3c; }
+        .expiring .stat-number { color: #f39c12; }
+        .alerts .stat-number { color: #e67e22; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 35px;
+            margin-bottom: 35px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .department-section {
+            padding: 4px 10px;
+        }
+        .department-section label {
+            display: block;
+            margin: 0 0 6px 0;
+            font-size: 0.95rem;
+        }
+        .department-section label b { font-weight: 700; }
+        .dept-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .dept-btn {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            color: #2c3e50;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: left;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .dept-btn:hover { box-shadow: 0 2px 8px rgba(31,38,135,0.08); }
+        .dept-btn.active {
+            background: linear-gradient(45deg, #4f8cff, #6a82fb);
+            color: #fff;
+            border-color: transparent;
+        }
+        .section {
+            background: #fff;
+            border-radius: 18px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 24px rgba(31, 38, 135, 0.08);
+        }
+        .section h2 {
+            margin-bottom: 22px;
+            color: #2c3e50;
+            border-bottom: 3px solid #4f8cff;
+            padding-bottom: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 13px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        #barcodeLinkItem, #rfidLinkItem { min-width: 0; }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4f8cff;
+        }
+        .btn {
+            background: linear-gradient(45deg, #4f8cff, #6a82fb);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 5px 15px rgba(79, 140, 255, 0.18);
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+        .btn-warning {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background: linear-gradient(45deg, #4f8cff, #6a82fb);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .item {
+            background: #f8f9fa;
+            margin: 12px 0;
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 5px solid #4f8cff;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(31, 38, 135, 0.05);
+        }
+        .item:hover {
+            transform: translateX(7px) scale(1.01);
+        }
+        .item.low-stock {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        .item.expiring {
+            border-left-color: #f39c12;
+            background: #fef9e7;
+        }
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 16px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 1rem;
+        }
+        .alert.high { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .alert.critical { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 12px 0;
+            display: none;
+            font-size: 1rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 22px;
+            color: #7f8c8d;
+        }
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000;
+        }
+        .toast {
+            min-width: 260px;
+            max-width: 380px;
+            background: #ffffff;
+            border-left: 6px solid #4f8cff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            animation: slideIn 0.2s ease-out;
+        }
+        .toast.high { border-left-color: #e74c3c; }
+        .toast.critical { border-left-color: #c0392b; }
+        .toast .title { font-weight: 700; margin-bottom: 4px; }
+        @keyframes slideIn { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .section {
+                padding: 15px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% set is_doctor = user and user.role == 'doctor' %}
+    <div class="container">
+        <header>
+            <div class="brand-logo">VitaFlow</div>
+            <h1>🏥 Clinic Inventory Management</h1>
+            <p class="subtitle">Smart inventory tracking for healthcare facilities</p>
+
+        <div class="stats-grid">
+    </head>
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card low-stock" onclick="goToLowStock()" style="cursor:pointer;">
+                <div class="stat-number" id="lowStockCount">0</div>
+                <div class="stat-label">Low Stock</div>
+            </div>
+            <div class="stat-card expiring" onclick="goToExpiring()" style="cursor:pointer;">
+                <div class="stat-number" id="expiringCount">0</div>
+                <div class="stat-label">Expiring Soon</div>
+            </div>
+            <div class="stat-card alerts" onclick="goToAlerts()" style="cursor:pointer;">
+                <div class="stat-number" id="alertCount">0</div>
+                <div class="stat-label">Active Alerts</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            {% if not is_doctor %}
+            <div class="section department-section">
+                <label><b>Select Department:</b></label>
+                <div class="dept-buttons" id="deptButtons">
+                    <button type="button" class="dept-btn active" data-dept="">All Departments</button>
+                    {% for dept in departments %}
+                    <button type="button" class="dept-btn" data-dept="{{ dept }}">{{ dept }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="section">
+                <h2>📝 Add New Item</h2>
+                <form id="addItemForm">
+                    <div class="form-group">
+                        <label for="itemName">Item Name</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="medication">Medication</option>
+                            <option value="supplies">Medical Supplies</option>
+                            <option value="equipment">Equipment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentStock">Current Stock</label>
+                        <input type="number" id="currentStock" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="minThreshold">Minimum Threshold</label>
+                        <input type="number" id="minThreshold" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit</label>
+                        <input type="text" id="unit" placeholder="e.g., tablets, bottles, pieces" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="barcode">Barcode</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" id="barcode" placeholder="Scan or enter barcode">
+                            <button type="button" class="btn" style="width:auto; padding:10px 14px;" onclick="openScanner()">Scan</button>
+                        </div>
+                        <div id="barcodeMatch" style="margin-top:6px; font-size:0.9rem; color:#555;"></div>
+                        <div id="barcodeLinker" style="display:none; margin-top:6px;">
+                            <label style="display:block; margin-bottom:4px; font-size:0.9rem;">Link this barcode to an existing item:</label>
+                            <div style="display:flex; gap:8px;">
+                                <select id="barcodeLinkItem" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:8px;"></select>
+                                <button type="button" class="btn" style="width:auto; padding:10px 14px;" onclick="linkBarcodeToItem()">Link</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rfid">RFID Tag</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" id="rfid" placeholder="Tap or enter RFID tag">
+                            <button type="button" class="btn" style="width:auto; padding:10px 14px;" onclick="readRfidOnce()">Read RFID</button>
+                        </div>
+                        <div id="rfidMatch" style="margin-top:6px; font-size:0.9rem; color:#555;"></div>
+                        <div id="rfidLinker" style="display:none; margin-top:6px;">
+                            <label style="display:block; margin-bottom:4px; font-size:0.9rem;">Link this RFID to an existing item:</label>
+                            <div style="display:flex; gap:8px;">
+                                <select id="rfidLinkItem" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:8px;"></select>
+                                <button type="button" class="btn" style="width:auto; padding:10px 14px;" onclick="linkRfidToItem()">Link</button>
+                            </div>
+                        </div>
+                        <div id="rfidSupportNote" style="margin-top:6px; font-size:0.85rem; color:#777;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitPrice">Unit Price ($)</label>
+                        <input type="number" id="unitPrice" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier">Supplier</label>
+                        <input type="text" id="supplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplierEmail">Supplier Email (optional)</label>
+                        <input type="email" id="supplierEmail" placeholder="supplier@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiryDate">Expiry Date</label>
+                        <input type="date" id="expiryDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Storage Location</label>
+                        <input type="text" id="location" placeholder="e.g., Room A, Storage B" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDepartment">Department</label>
+                        <select id="itemDepartment" required>
+                            <option value="">Select Department</option>
+                            {% for dept in departments %}
+                            <option value="{{ dept }}">{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="brandName">Brand Name (optional)</label>
+                        <input type="text" id="brandName" placeholder="e.g., Dolo 650, Calpol">
+                    </div>
+                    <button type="submit" class="btn">Add Item</button>
+                </form>
+                <div id="addItemSuccess" class="success-message">Item added successfully!</div>
+            </div>
+            {% endif %}
+
+            <div class="section full-width">
+                <h2>📊 Inventory Overview</h2>
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('all-items')">All Items</button>
+                    <button class="tab" onclick="showTab('alerts')">Alerts</button>
+                    <button class="tab" onclick="showTab('restock')">Restock</button>
+                </div>
+
+                <div id="all-items" class="tab-content active">
+                    <div id="itemsList" class="item-list">
+                        <div class="loading">Loading items...</div>
+                    </div>
+                </div>
+
+                <div id="alerts" class="tab-content">
+                    <div id="alertsList">
+                        <div class="loading">Loading alerts...</div>
+                    </div>
+                </div>
+
+                <div id="restock" class="tab-content">
+                    <div id="restockList">
+                        <div class="loading">Loading restock suggestions...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if not is_doctor %}
+        <div class="section">
+            <h2>⚡ Quick Actions</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <button class="btn btn-success" onclick="refreshData()">🔄 Refresh Data</button>
+                <button class="btn btn-warning" onclick="showLowStock()">⚠️ Show Low Stock</button>
+                <button class="btn btn-danger" onclick="showExpiring()">📅 Show Expiring</button>
+                <button class="btn" onclick="generatePOs()">🛒 Generate Purchase Orders</button>
+            </div>
+        </div>
+
+        <div class="section" id="suggestedProductsSection" style="margin-bottom: 20px;">
+            <h2>Suggested Products for <span id="suggestedDept">All Departments</span></h2>
+            <div id="suggestedProductsList"></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="scannerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:16px; width:min(520px, 92vw);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="margin:0;">Scan Barcode</h3>
+                <button type="button" onclick="closeScanner()" style="border:none; background:#eee; padding:6px 10px; border-radius:6px; cursor:pointer;">Close</button>
+            </div>
+            <video id="scannerPreview" style="width:100%; border-radius:10px; background:#000;" autoplay muted></video>
+            <div id="scannerStatus" style="margin-top:8px; font-size:0.9rem; color:#555;">Point the camera at a barcode…</div>
+        </div>
+    </div>
+
+ 
+    <div id="toastContainer"></div>
+
+    <script>
+        
+        let allItems = [];
+        let alerts = [];
+        let selectedDepartment = '';
+        let knownAlertIds = new Set();
+
+       
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            setupForm();
+            setupDepartmentButtons();
+            startAlertPolling();
+        });
+
+     
+        function setupForm() {
+            document.getElementById('addItemForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addItem();
+            });
+            const bc = document.getElementById('barcode');
+            bc.addEventListener('change', () => lookupBarcode(bc.value.trim()));
+            bc.addEventListener('input', () => {
+                document.getElementById('barcodeMatch').textContent = '';
+            });
+            const rf = document.getElementById('rfid');
+            rf.addEventListener('change', () => lookupRfid(rf.value.trim()));
+            rf.addEventListener('input', () => { document.getElementById('rfidMatch').textContent = ''; });
+           
+            document.getElementById('rfidSupportNote').textContent = navigator.serial ? '' : 'Web Serial not supported in this browser. You can still type or use a keyboard-wedge reader.';
+        }
+
+        
+        let codeReader;
+        let currentStream;
+        async function openScanner() {
+            const modal = document.getElementById('scannerModal');
+            modal.style.display = 'flex';
+            document.getElementById('scannerStatus').textContent = 'Initializing camera…';
+            try {
+                
+                if (!window.ZXing) {
+                    await new Promise((resolve, reject) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js';
+                        s.onload = resolve; s.onerror = reject; document.body.appendChild(s);
+                    });
+                }
+                const { BrowserMultiFormatReader } = window.ZXing;
+                codeReader = new BrowserMultiFormatReader();
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoInputs = devices.filter(d => d.kind === 'videoinput');
+                const selectedDeviceId = videoInputs.length ? videoInputs[videoInputs.length - 1].deviceId : undefined;
+                const preview = document.getElementById('scannerPreview');
+                const result = await codeReader.decodeFromVideoDevice(selectedDeviceId, preview, (res, err) => {
+                    if (res) {
+                        const code = res.getText();
+                        document.getElementById('barcode').value = code;
+                        document.getElementById('scannerStatus').textContent = 'Detected: ' + code;
+                        lookupBarcode(code);
+                        closeScanner();
+                    }
+                });
+                document.getElementById('scannerStatus').textContent = 'Scanning…';
+            } catch (err) {
+                console.error('Scanner init error', err);
+                document.getElementById('scannerStatus').textContent = 'Unable to access camera. Check permissions.';
+            }
+        }
+        function closeScanner() {
+            const modal = document.getElementById('scannerModal');
+            modal.style.display = 'none';
+            try { if (codeReader) codeReader.reset(); } catch {}
+            try {
+                const preview = document.getElementById('scannerPreview');
+                const stream = preview.srcObject;
+                if (stream) { stream.getTracks().forEach(t => t.stop()); preview.srcObject = null; }
+            } catch {}
+        }
+
+        async function addItem() {
+            const formData = {
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('category').value,
+                current_stock: parseInt(document.getElementById('currentStock').value),
+                min_threshold: parseInt(document.getElementById('minThreshold').value),
+                unit: document.getElementById('unit').value,
+                barcode: document.getElementById('barcode').value,
+                rfid_tag: document.getElementById('rfid').value,
+                unit_price: parseFloat(document.getElementById('unitPrice').value),
+                supplier_name: document.getElementById('supplier').value,
+                supplier_email: document.getElementById('supplierEmail').value,
+                expiry_date: document.getElementById('expiryDate').value,
+                location: document.getElementById('location').value,
+                department: document.getElementById('itemDepartment').value,
+                brand_name: document.getElementById('brandName').value
+            };
+
+            try {
+                const response = await fetch('/api/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('addItemSuccess').style.display = 'block';
+                    document.getElementById('addItemForm').reset();
+                    setTimeout(() => {
+                        document.getElementById('addItemSuccess').style.display = 'none';
+                    }, 3000);
+                    refreshData();
+                }
+            } catch (error) {
+                console.error('Error adding item:', error);
+                alert('Error adding item. Please try again.');
+            }
+        }
+
+        async function lookupBarcode(code) {
+            const el = document.getElementById('barcodeMatch');
+            if (!code) { el.textContent = ''; return; }
+            el.textContent = 'Looking up…';
+            try {
+                const resp = await fetch(`/api/items/by-barcode/${encodeURIComponent(code)}`);
+                if (resp.ok) {
+                    const item = await resp.json();
+                    el.innerHTML = `<b>Matched:</b> ${item.name} (${item.unit}) — Stock: ${item.current_stock}`;
+                    // Optional: prefill some fields
+                    if (!document.getElementById('itemName').value) document.getElementById('itemName').value = item.name;
+                    if (!document.getElementById('unit').value) document.getElementById('unit').value = item.unit;
+                    if (!document.getElementById('brandName').value && item.brand_name) document.getElementById('brandName').value = item.brand_name;
+                    // Hide linker if visible
+                    document.getElementById('barcodeLinker').style.display = 'none';
+                } else {
+                    el.textContent = 'No existing item found for this barcode.';
+                    // Populate dropdown with existing items to link
+                    try {
+                        const itemsResp = await fetch('/api/items');
+                        const items = await itemsResp.json();
+                        const sel = document.getElementById('barcodeLinkItem');
+                        sel.innerHTML = items.map(i => `<option value="${i.id}">${i.name} (${i.unit})</option>`).join('');
+                        document.getElementById('barcodeLinker').style.display = 'block';
+                    } catch {}
+                }
+            } catch (e) {
+                el.textContent = 'Lookup failed.';
+            }
+        }
+
+        async function lookupRfid(tag) {
+            const el = document.getElementById('rfidMatch');
+            if (!tag) { el.textContent = ''; return; }
+            el.textContent = 'Looking up…';
+            try {
+                const resp = await fetch(`/api/items/by-rfid/${encodeURIComponent(tag)}`);
+                if (resp.ok) {
+                    const item = await resp.json();
+                    el.innerHTML = `<b>Matched:</b> ${item.name} (${item.unit}) — Stock: ${item.current_stock}`;
+                    if (!document.getElementById('itemName').value) document.getElementById('itemName').value = item.name;
+                    if (!document.getElementById('unit').value) document.getElementById('unit').value = item.unit;
+                    if (!document.getElementById('brandName').value && item.brand_name) document.getElementById('brandName').value = item.brand_name;
+                    document.getElementById('rfidLinker').style.display = 'none';
+                } else {
+                    el.textContent = 'No existing item found for this RFID.';
+                    try {
+                        const itemsResp = await fetch('/api/items');
+                        const items = await itemsResp.json();
+                        const sel = document.getElementById('rfidLinkItem');
+                        sel.innerHTML = items.map(i => `<option value="${i.id}">${i.name} (${i.unit})</option>`).join('');
+                        document.getElementById('rfidLinker').style.display = 'block';
+                    } catch {}
+                }
+            } catch (e) {
+                el.textContent = 'Lookup failed.';
+            }
+        }
+
+        async function linkRfidToItem() {
+            const tag = document.getElementById('rfid').value.trim();
+            const itemId = document.getElementById('rfidLinkItem').value;
+            if (!tag || !itemId) return;
+            const body = new URLSearchParams({ rfid_tag: tag });
+            const resp = await fetch(`/api/items/${itemId}/rfid`, { method: 'PUT', body });
+            if (resp.ok) {
+                document.getElementById('rfidMatch').textContent = 'RFID linked successfully.';
+                document.getElementById('rfidLinker').style.display = 'none';
+            } else {
+                const data = await resp.json().catch(() => ({}));
+                alert(data.detail || 'Failed to link RFID');
+            }
+        }
+
+
+        async function readRfidOnce() {
+            const note = document.getElementById('rfidSupportNote');
+            if (!('serial' in navigator)) {
+                note.textContent = 'Web Serial not supported here. Use Chrome/Edge on HTTPS or type the tag.';
+                return;
+            }
+            try {
+                const port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 9600 });
+                const decoder = new TextDecoderStream();
+                const readableStreamClosed = port.readable.pipeTo(decoder.writable);
+                const reader = decoder.readable.getReader();
+                let buffer = '';
+                let tag = '';
+                const timeout = Date.now() + 8000; // 8s
+                while (Date.now() < timeout) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += value;
+                    const idx = buffer.indexOf('\n');
+                    if (idx !== -1) {
+                        tag = buffer.slice(0, idx).trim();
+                        break;
+                    }
+                }
+                reader.releaseLock();
+                try { await port.close(); } catch {}
+                if (tag) {
+                    document.getElementById('rfid').value = tag;
+                    lookupRfid(tag);
+                } else {
+                    document.getElementById('rfidMatch').textContent = 'No tag read.';
+                }
+            } catch (e) {
+                document.getElementById('rfidMatch').textContent = 'Unable to open serial port.';
+            }
+        }
+
+        async function linkBarcodeToItem() {
+            const code = document.getElementById('barcode').value.trim();
+            const itemId = document.getElementById('barcodeLinkItem').value;
+            if (!code || !itemId) return;
+            const body = new URLSearchParams({ barcode: code });
+            const resp = await fetch(`/api/items/${itemId}/barcode`, { method: 'PUT', body });
+            if (resp.ok) {
+                document.getElementById('barcodeMatch').textContent = 'Barcode linked successfully.';
+                document.getElementById('barcodeLinker').style.display = 'none';
+            } else {
+                const data = await resp.json().catch(() => ({}));
+                alert(data.detail || 'Failed to link barcode');
+            }
+        }
+
+       
+        async function refreshData() {
+            await Promise.all([
+                loadItems(),
+                loadAlerts(),
+                loadRestockSuggestions(),
+                updateStats()
+            ]);
+        }
+
+       
+        async function loadItems() {
+            try {
+                const response = await fetch('/api/items');
+                allItems = await response.json();
+                let dept = selectedDepartment || '';
+                let filtered = allItems;
+                if (dept) {
+                    filtered = allItems.filter(item => item.department === dept);
+                }
+                await displayItems(filtered);
+            } catch (error) {
+                console.error('Error loading items:', error);
+            }
+        }
+
+        
+        async function loadAlerts() {
+            try {
+                const response = await fetch('/api/alerts');
+                alerts = await response.json();
+                displayAlerts(alerts);
+                // Initialize known alerts on first load
+                if (knownAlertIds.size === 0 && Array.isArray(alerts)) {
+                    alerts.forEach(a => knownAlertIds.add(a.id));
+                }
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        async function loadRestockSuggestions() {
+            try {
+                const response = await fetch('/api/restock-suggestions');
+                const suggestions = await response.json();
+                displayRestockSuggestions(suggestions);
+            } catch (error) {
+                console.error('Error loading restock suggestions:', error);
+            }
+        }
+
+        
+        async function displayItems(items) {
+            const container = document.getElementById('itemsList');
+            if (items.length === 0) {
+                container.innerHTML = '<div class="loading">No items found. Add some items to get started!</div>';
+                return;
+            }
+
+           
+            let usageMap = {};
+            try {
+                const resp = await fetch('/api/restock-suggestions');
+                const suggestions = await resp.json();
+                for (const s of suggestions) {
+                    usageMap[s.item_id] = s.avg_daily_usage || 0;
+                }
+            } catch {}
+
+           
+            const grouped = {};
+            for (const item of items) {
+                if (!grouped[item.name]) grouped[item.name] = [];
+                grouped[item.name].push(item);
+            }
+            container.innerHTML = Object.entries(grouped).map(([pharma, brands]) => {
+                
+                const first = brands[0];
+                let brandsHtml = brands.map(brandItem => {
+                    const stockStatus = brandItem.current_stock <= brandItem.min_threshold ? 'low-stock' : '';
+                    const daysToExpiry = Math.ceil((new Date(brandItem.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    const expiringStatus = daysToExpiry <= 30 ? 'expiring' : '';
+                    const usage = usageMap[brandItem.id] !== undefined ? usageMap[brandItem.id].toFixed(2) : 'N/A';
+                    return `<div class="brand-item ${stockStatus} ${expiringStatus}">
+                        <span class='brand'><b>${brandItem.brand_name || 'Generic'}</b></span>:
+                        <span>Stock: ${brandItem.current_stock} ${brandItem.unit} ${brandItem.current_stock <= brandItem.min_threshold ? '⚠️' : ''}</span>
+                        <span> | Usage Rate: <b>${usage}</b> per day</span>
+                        <span> | Expires: ${new Date(brandItem.expiry_date).toLocaleDateString()} ${daysToExpiry <= 30 ? '📅' : ''}</span>
+                        <span> | Supplier: ${brandItem.supplier_name}</span>
+                    </div>`;
+                }).join('');
+                return `<div class="item-group">
+                    <strong>${pharma}</strong> (${first.category})
+                    <div class="brand-list">${brandsHtml}</div>
+                </div>`;
+            }).join('');
+        }
+
+       
+        function displayAlerts(alerts) {
+            const container = document.getElementById('alertsList');
+            if (alerts.length === 0) {
+                container.innerHTML = '<div class="loading">No active alerts. Great job!</div>';
+                return;
+            }
+
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert ${alert.priority}">
+                    <strong>${alert.alert_type.replace('_', ' ').toUpperCase()}</strong>
+                    <br>${alert.message}
+                    <br><small>Created: ${new Date(alert.created_at).toLocaleString()}</small>
+                </div>
+            `).join('');
+        }
+
+       
+        function displayRestockSuggestions(suggestions) {
+            const container = document.getElementById('restockList');
+            if (suggestions.length === 0) {
+                container.innerHTML = '<div class="loading">No restock needed right now!</div>';
+                return;
+            }
+
+            container.innerHTML = suggestions.map(item => `
+                <div class="item">
+                    <strong>${item.item_name}</strong>
+                    <br>Current Stock: ${item.current_stock}
+                    <br>Suggested Order: ${item.suggested_order_quantity} units
+                    <br>Supplier: ${item.supplier}
+                    <br>Estimated Cost: $${item.estimated_cost.toFixed(2)}
+                </div>
+            `).join('');
+        }
+
+        
+        async function updateStats() {
+            try {
+                const [itemsResponse, lowStockResponse, expiringResponse, alertsResponse] = await Promise.all([
+                    fetch('/api/items'),
+                    fetch('/api/low-stock'),
+                    fetch('/api/expiring-soon'),
+                    fetch('/api/alerts')
+                ]);
+
+                const items = await itemsResponse.json();
+                const lowStock = await lowStockResponse.json();
+                const expiring = await expiringResponse.json();
+                const alerts = await alertsResponse.json();
+
+                document.getElementById('totalItems').textContent = items.length;
+                document.getElementById('lowStockCount').textContent = lowStock.length;
+                document.getElementById('expiringCount').textContent = expiring.length;
+                document.getElementById('alertCount').textContent = alerts.length;
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+       
+        function startAlertPolling() {
+            
+            setInterval(checkNewAlerts, 15000);
+        }
+        async function checkNewAlerts() {
+            try {
+                const resp = await fetch('/api/alerts');
+                if (!resp.ok) return;
+                const latest = await resp.json();
+                let foundNew = false;
+                for (const a of latest) {
+                    if (!knownAlertIds.has(a.id)) {
+                        knownAlertIds.add(a.id);
+                        showToast(`${a.alert_type.replace('_',' ').toUpperCase()}: ${a.message}`, a.priority);
+                        foundNew = true;
+                    }
+                }
+                if (foundNew) {
+                    alerts = latest;
+                    displayAlerts(alerts);
+                    updateStats();
+                }
+            } catch {}
+        }
+        function showToast(message, priority) {
+            const container = document.getElementById('toastContainer');
+            const div = document.createElement('div');
+            div.className = `toast ${priority || ''}`;
+            div.innerHTML = `<div class="title">New Alert</div><div>${message}</div>`;
+            container.appendChild(div);
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => div.remove(), 350);
+            }, 5500);
+        }
+
+        
+        async function generatePOs() {
+            try {
+                const resp = await fetch('/api/purchase-orders/auto', { method: 'POST' });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    alert('Purchase orders generated: #' + (data.purchase_order_ids || []).join(', '));
+                } else {
+                    alert('Failed to generate purchase orders');
+                }
+            } catch (e) { alert('Failed to generate purchase orders'); }
+        }
+
+        
+        function showTab(tabName) {
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+           
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            
+            document.getElementById(tabName).classList.add('active');
+            
+          
+            event.target.classList.add('active');
+        }
+
+        function goToAlerts() {
+            showTab('alerts');
+            const el = document.getElementById('alerts');
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function goToExpiring() {
+            // Filter expiring items and scroll to items section
+            showTab('all-items');
+            showExpiring();
+            const el = document.getElementById('all-items');
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function goToLowStock() {
+            showTab('all-items');
+            showLowStock();
+            const el = document.getElementById('all-items');
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+
+        function showLowStock() {
+            const lowStockItems = allItems.filter(item => item.current_stock <= item.min_threshold);
+            displayItems(lowStockItems);
+            showTab('all-items');
+        }
+
+        function showExpiring() {
+            const expiringItems = allItems.filter(item => {
+                const daysToExpiry = Math.ceil((new Date(item.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                return daysToExpiry <= 30;
+            });
+            displayItems(expiringItems);
+            showTab('all-items');
+        }
+
+
+        const IMPORTANT_PRODUCTS = {
+            "Emergency Department (ER/ED)": [
+                {name: "Dolo 650", category: "medication", unit: "tablets", unit_price: 2.0},
+                {name: "Azithromycin", category: "medication", unit: "tablets", unit_price: 10.0},
+                {name: "IV Set", category: "supplies", unit: "pieces", unit_price: 50.0},
+            ],
+            "Internal Medicine": [
+                {name: "Metformin", category: "medication", unit: "tablets", unit_price: 5.0},
+                {name: "Amlodipine", category: "medication", unit: "tablets", unit_price: 4.0},
+            ],
+            "Pediatrics": [
+                {name: "Paracetamol Syrup", category: "medication", unit: "bottles", unit_price: 20.0},
+                {name: "ORS Sachet", category: "supplies", unit: "sachets", unit_price: 3.0},
+            ],
+           
+        };
+
+        function renderSuggestedProducts(dept) {
+            const section = document.getElementById('suggestedProductsSection');
+            const list = document.getElementById('suggestedProductsList');
+            const deptName = document.getElementById('suggestedDept');
+            if (!section || !list || !deptName) return;
+            deptName.textContent = dept || 'All Departments';
+            list.innerHTML = '';
+            if (!dept || !IMPORTANT_PRODUCTS[dept]) {
+                list.innerHTML = '';
+                return;
+            }
+            list.innerHTML = IMPORTANT_PRODUCTS[dept].map(prod => `
+                <div style="margin-bottom:10px; padding:10px; background:#f8f9fa; border-radius:8px;">
+                    <b>${prod.name}</b> (${prod.category}, ${prod.unit})
+                    <button class="btn btn-success" style="margin-left:10px; padding:5px 15px; font-size:0.9rem;" onclick='quickAddProduct("${prod.name}", "${prod.category}", "${prod.unit}", ${prod.unit_price}, "${dept}")'>Add to Inventory</button>
+                </div>
+            `).join('');
+        }
+
+        function quickAddProduct(name, category, unit, unit_price, department) {
+            const formData = {
+                name,
+                category,
+                current_stock: 100,
+                min_threshold: 10,
+                unit,
+                unit_price,
+                supplier_name: 'Default Supplier',
+                expiry_date: new Date(Date.now() + 365*24*60*60*1000).toISOString().slice(0,10),
+                location: 'Main Store',
+                department
+            };
+            fetch('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData)
+            }).then(resp => {
+                if (resp.ok) {
+                    alert('Product added!');
+                    refreshData();
+                } else {
+                    alert('Failed to add product.');
+                }
+            });
+        }
+
+        
+        function setupDepartmentButtons() {
+            const container = document.getElementById('deptButtons');
+            if (!container) return;
+            container.addEventListener('click', (e) => {
+                const btn = e.target.closest('.dept-btn');
+                if (!btn) return;
+                selectedDepartment = btn.getAttribute('data-dept') || '';
+                
+                container.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                loadItems();
+                renderSuggestedProducts(selectedDepartment);
+            });
+            
+            renderSuggestedProducts(selectedDepartment);
+        }
+    </script>
+</body>
+</html>
